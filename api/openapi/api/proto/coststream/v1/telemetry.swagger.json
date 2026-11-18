@@ -1,0 +1,260 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/proto/coststream/v1/telemetry.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "TelemetryService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/costs/summary": {
+      "get": {
+        "summary": "QueryCostSummary returns aggregated cost and resource utilization metrics.",
+        "operationId": "TelemetryService_QueryCostSummary",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1QueryCostResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "costCenter",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fromTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          },
+          {
+            "name": "toTime",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "TelemetryService"
+        ]
+      }
+    },
+    "/v1/telemetry/batch": {
+      "post": {
+        "summary": "IngestBatch handles unary batch ingestion of telemetry records.",
+        "operationId": "TelemetryService_IngestBatch",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1BatchIngestResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "BatchIngestRequest contains a list of records with an optional idempotency key.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1BatchIngestRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TelemetryService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1BatchIngestRequest": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1TelemetryRecord"
+          }
+        }
+      },
+      "description": "BatchIngestRequest contains a list of records with an optional idempotency key."
+    },
+    "v1BatchIngestResponse": {
+      "type": "object",
+      "properties": {
+        "acceptedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "rejectedCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "BatchIngestResponse returns ingestion statistics for a submitted batch."
+    },
+    "v1QueryCostResponse": {
+      "type": "object",
+      "properties": {
+        "tenantId": {
+          "type": "string"
+        },
+        "costCenter": {
+          "type": "string"
+        },
+        "totalCostUsd": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalCpuHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalGbHours": {
+          "type": "number",
+          "format": "double"
+        },
+        "totalSamples": {
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "QueryCostResponse contains aggregated financial and resource usage metrics."
+    },
+    "v1StreamSummaryResponse": {
+      "type": "object",
+      "properties": {
+        "totalIngested": {
+          "type": "string",
+          "format": "int64"
+        },
+        "sessionStart": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sessionEnd": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "StreamSummaryResponse returns summary metrics for a client streaming session."
+    },
+    "v1TelemetryRecord": {
+      "type": "object",
+      "properties": {
+        "eventId": {
+          "type": "string"
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "clusterId": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "workloadName": {
+          "type": "string"
+        },
+        "costCenter": {
+          "type": "string"
+        },
+        "cpuCoresUsed": {
+          "type": "number",
+          "format": "double"
+        },
+        "memoryBytesUsed": {
+          "type": "string",
+          "format": "int64"
+        },
+        "estimatedHourlyCostUsd": {
+          "type": "number",
+          "format": "double"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "labels": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "TelemetryRecord represents a single resource utilization and cost data point."
+    }
+  }
+}

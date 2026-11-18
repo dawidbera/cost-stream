@@ -1,0 +1,82 @@
+syntax = "proto3";
+
+package coststream.v1;
+
+option go_package = "github.com/dawidbera/cost-stream/api/proto/coststream/v1;coststreamv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// TelemetryService provides high-throughput ingestion and aggregated cost querying for FinOps.
+service TelemetryService {
+  // IngestBatch handles unary batch ingestion of telemetry records.
+  rpc IngestBatch (BatchIngestRequest) returns (BatchIngestResponse) {
+    option (google.api.http) = {
+      post: "/v1/telemetry/batch"
+      body: "*"
+    };
+  }
+
+  // StreamTelemetry provides client-side streaming ingestion for high-frequency agents.
+  rpc StreamTelemetry (stream TelemetryRecord) returns (StreamSummaryResponse);
+
+  // QueryCostSummary returns aggregated cost and resource utilization metrics.
+  rpc QueryCostSummary (QueryCostRequest) returns (QueryCostResponse) {
+    option (google.api.http) = {
+      get: "/v1/costs/summary"
+    };
+  }
+}
+
+// TelemetryRecord represents a single resource utilization and cost data point.
+message TelemetryRecord {
+  string event_id = 1;
+  string tenant_id = 2;
+  string cluster_id = 3;
+  string namespace = 4;
+  string workload_name = 5;
+  string cost_center = 6;
+  double cpu_cores_used = 7;
+  int64 memory_bytes_used = 8;
+  double estimated_hourly_cost_usd = 9;
+  google.protobuf.Timestamp timestamp = 10;
+  map<string, string> labels = 11;
+}
+
+// BatchIngestRequest contains a list of records with an optional idempotency key.
+message BatchIngestRequest {
+  string idempotency_key = 1;
+  repeated TelemetryRecord records = 2;
+}
+
+// BatchIngestResponse returns ingestion statistics for a submitted batch.
+message BatchIngestResponse {
+  int32 accepted_count = 1;
+  int32 rejected_count = 2;
+  string status = 3;
+}
+
+// StreamSummaryResponse returns summary metrics for a client streaming session.
+message StreamSummaryResponse {
+  int64 total_ingested = 1;
+  google.protobuf.Timestamp session_start = 2;
+  google.protobuf.Timestamp session_end = 3;
+}
+
+// QueryCostRequest specifies filter criteria for cost aggregation.
+message QueryCostRequest {
+  string tenant_id = 1;
+  string cost_center = 2;
+  google.protobuf.Timestamp from_time = 3;
+  google.protobuf.Timestamp to_time = 4;
+}
+
+// QueryCostResponse contains aggregated financial and resource usage metrics.
+message QueryCostResponse {
+  string tenant_id = 1;
+  string cost_center = 2;
+  double total_cost_usd = 3;
+  double total_cpu_hours = 4;
+  double total_gb_hours = 5;
+  int64 total_samples = 6;
+}
