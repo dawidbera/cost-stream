@@ -1,0 +1,24 @@
+# Buf code generation template.
+# Defines code generators for Go protobuf structs, gRPC client/server interfaces,
+# gRPC-Gateway REST proxy handlers, and OpenAPI v2 swagger definitions.
+version: v1
+plugins:
+  # Generates standard Go protobuf structs
+  - plugin: go
+    out: .
+    opt:
+      - paths=source_relative
+  # Generates gRPC service client and server stubs
+  - plugin: go-grpc
+    out: .
+    opt:
+      - paths=source_relative
+  # Generates HTTP reverse proxy handler translating REST JSON calls into gRPC
+  - plugin: grpc-gateway
+    out: .
+    opt:
+      - paths=source_relative
+      - generate_unbound_methods=true
+  # Generates OpenAPI v2 Swagger specifications for HTTP endpoints
+  - plugin: openapiv2
+    out: api/openapi

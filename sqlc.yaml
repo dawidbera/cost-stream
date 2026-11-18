@@ -1,0 +1,14 @@
+# sqlc configuration file for compiling PostgreSQL queries into type-safe Go code.
+# Utilizes PostgreSQL engine with pgx/v5 driver package for zero-reflection high performance.
+version: "2"
+sql:
+  - engine: "postgresql"
+    schema: "internal/adapters/out/postgres/migrations"
+    queries: "internal/adapters/out/postgres/queries.sql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/adapters/out/postgres/db"
+        sql_package: "pgx/v5"
+        emit_json_tags: true
+        emit_empty_slices: true

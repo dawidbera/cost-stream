@@ -1,0 +1,12 @@
+# Buf configuration file for Protobuf linting, breaking change detection, and dependency management.
+# External dependency buf.build/googleapis/googleapis provides annotations.proto for gRPC-Gateway HTTP transcoding.
+version: v1
+name: buf.build/dawidbera/cost-stream
+deps:
+  - buf.build/googleapis/googleapis
+lint:
+  use:
+    - DEFAULT
+breaking:
+  use:
+    - FILE
