@@ -1,8 +1,8 @@
 # Build & Output
-target/
-build/
-out/
-bin/
+/target/
+/build/
+/out/
+/bin/
 
 # Go binaries & tests
 vendor/
