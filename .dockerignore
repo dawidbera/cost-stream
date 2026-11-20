@@ -1,0 +1,6 @@
+# Docker build context exclusions.
+bin/
+.git/
+.docs/
+*.md
+tests/testdata/
