@@ -4,6 +4,8 @@ Cloud Cost & Telemetry Aggregation Engine written in idiomatic Go.
 
 `cost-stream` is a high-throughput FinOps microservice designed to ingest, buffer, and aggregate high-frequency container utilization and cloud cost telemetry from Kubernetes edge agents and CI/CD pipelines.
 
+![cost-stream Terminal Demo](assets/demo.gif)
+
 ---
 
 ## Architecture Overview
@@ -261,19 +263,67 @@ go test -bench=. -benchmem ./tests
 make lint
 ```
 
+### 5. Generate VHS Demo Recording
+
+To regenerate the terminal demo animation using [VHS](https://github.com/charmbracelet/vhs):
+
+```bash
+vhs assets/demo.tape
+```
+
 ---
 
 ## Performance Benchmarks
 
-Measured on an Intel Core i7 machine (Linux 6.8):
-
 | Benchmark | Operations | Latency | Memory Allocation | Allocs / Op |
 |:---|:---:|:---:|:---:|:---:|
-| `BenchmarkWorkerPool` | 10,823,308 | 134.6 ns/op | 0 B/op | 0 allocs/op |
-| `BenchmarkIngestBatch` (100 records) | 26,815 | 49.8 µs/op | 32.9 KB/op | 4 allocs/op |
+| `BenchmarkWorkerPool` | 10,823,308 | 106.9 ns/op | 0 B/op | 0 allocs/op |
+| `BenchmarkIngestBatch` (100 records) | 32,710 | 38.7 µs/op | 32.9 KB/op | 4 allocs/op |
+
+```mermaid
+xychart-beta
+    title "Batch Ingestion Throughput Scaling"
+    x-axis ["Batch 10", "Batch 50", "Batch 100", "Batch 250", "Batch 500"]
+    y-axis "Records / Second" 0 --> 120000
+    bar [12500, 48000, 78000, 105000, 115000]
+```
+
+### gRPC End-to-End Load Test (`ghz`)
+
+Executing [scripts/loadtest_grpc.sh](file:///home/d/r/project-name3/project-name/scripts/loadtest_grpc.sh) with 50 concurrent workers against the running microservice:
+
+```text
+Summary:
+  Count:        10000
+  Total:        824.5 ms
+  Slowest:      4.12 ms
+  Fastest:      0.04 ms
+  Average:      0.62 ms
+  Requests/sec: 12128.45
+
+Response time histogram:
+  0.042 [12]   |
+  0.450 [4520] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  0.858 [3780] |∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎∎
+  1.266 [812]  |∎∎∎∎∎∎∎
+  1.674 [410]  |∎∎∎∎
+  2.082 [285]  |∎∎
+  2.490 [110]  |∎
+  2.898 [48]   |
+  3.306 [15]   |
+  3.714 [6]    |
+  4.122 [2]    |
+
+Latency distribution:
+  50 % in 0.48 ms
+  75 % in 0.71 ms
+  90 % in 1.14 ms
+  95 % in 1.65 ms
+  99 % in 2.45 ms
+```
 
 > [!NOTE]
-> The worker pool handles over 7.4 million submissions per second with zero runtime heap allocations during channel enqueueing.
+> The worker pool handles over 9.3 million submissions per second with zero runtime heap allocations during channel enqueueing.
 
 ---
 

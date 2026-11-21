@@ -14,6 +14,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	goredis "github.com/redis/go-redis/v9"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
 	coststreamv1 "github.com/dawidbera/cost-stream/api/proto/coststream/v1"
 	grpcAdapter "github.com/dawidbera/cost-stream/internal/adapters/in/grpc"
@@ -137,6 +138,7 @@ func run() error {
 		),
 	)
 	coststreamv1.RegisterTelemetryServiceServer(grpcServer, grpcHandler)
+	reflection.Register(grpcServer)
 
 	grpcLis, lisErr := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPCPort))
 	if lisErr != nil {

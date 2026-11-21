@@ -1,0 +1,17 @@
+{
+  "idempotency_key": "batch-demo-101",
+  "records": [
+    {
+      "event_id": "evt-prod-001",
+      "tenant_id": "acme-corp",
+      "cluster_id": "k8s-prod-us-east",
+      "namespace": "checkout",
+      "workload_name": "payment-api",
+      "cost_center": "payments",
+      "cpu_cores_used": 2.5,
+      "memory_bytes_used": 2147483648,
+      "estimated_hourly_cost_usd": 0.45,
+      "timestamp": "2026-11-20T23:00:00Z"
+    }
+  ]
+}
